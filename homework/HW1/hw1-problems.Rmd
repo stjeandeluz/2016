@@ -39,7 +39,13 @@ We will use the following datasets:
 
 Create five `tbl_df` table objects, one for each of the tables provided in the above files. Hints: Use the `read_csv` function. Because these are only temporary files, give them short names.
 ```{r,include=FALSE}
-# Put your code here.
+# Put your code here.\
+> temp_mortal <- read.csv("C:/R files/indicator gapminder under5mortality - Data.csv")
+> temp_life <- read.csv("C:/R files/indicator life_expectancy_at_birth - Data.csv")
+> temp_fertile <- read.csv("C:/R files/indicator undata total_fertility - Data.csv")
+> temp_pop <- read.csv("C:/R files/indicator gapminder population - Data.csv")
+> temp_gdp <- read.csv("C:/R files/indicator GDP at market prices, constant 2000 US$ (WB estimates) - Data.csv")
+
 ```
 
 
@@ -49,6 +55,24 @@ Create five `tbl_df` table objects, one for each of the tables provided in the a
 
 ```{r}
 # Your code goes here.
+> my_func <- function(table_name) {colnames(table_name)}
+> my_func(temp_mortal)
+> my_func(temp_life)
+> my_func(temp_fertile)
+> my_func(temp_pop)
+> my_func(temp_gdp)
+
+> # in each table country name is in column 1
+> # in temp_mortal: Under.five.mortality
+> View(temp_life)
+> # in temp_life: Life.expectancy.with.projections..Yellow.is.IHME
+> View(temp_fertile)
+> # in temp_fertile: Total.fertility.rate
+> # in temp_pop: Total.population
+> View(temp_gdp)
+> # in temp_gdp: GDP..constant.2000.US..
+
+
 ```
 
 ## Problem 1.3 
@@ -57,6 +81,12 @@ In the previous problem we noted that gapminder is inconsistent in naming their 
 
 ```{r}
 # Your code goes here.
+> names(temp_mortal)[1]<-"country"
+> names(temp_life)[1]<-"country"
+> names(temp_fertile)[1]<-"country"
+> names(temp_pop)[1] <- "country"
+> names(temp_gdp)[1] <- "country
+
 ```
 
 ## Problem 1.4 
@@ -65,18 +95,30 @@ Notice that in these tables, years are represented by columns. We want to create
 
 ```{r}
 # Your code goes here.
+# see below ...
+
 ```
 
 We call this the _long_ format. Use the `gather` function from the `tidyr` package to create a new table for childhood mortality using the long format. Call the new columns `year` and `child_mortality`
 
 ```{r}
 # Your code goes here.
+> install.packages("tidyr")
+> library(tidyr)
+
+> # use column counts from my_func
+> mortal <- gather(temp_mortal,year,child_mortality,X1800:X2015)
+
 ```
 
 Now redefine the remaining tables in this way.
 
 ```{r}
 # Your code goes here.
+> life <- gather(temp_life,year,life_expectancy,X1800:X2015)
+> fertile <- gather(temp_fertile,year,fertility,X1800:X2015)
+> pop <- gather(temp_pop,year,population,X1800:X2015)
+> gdp <- gather(temp_gdp,year,gdp,X1960:X2011)
 ```
 
 
@@ -86,6 +128,11 @@ Now we want to join all these files together. Make one consolidated table contai
 
 ```{r}
 # Your code goes here.
+> all_1 <- merge(mortal,life,all=TRUE)
+> all_2 <- merge(all_1,fertile,all=TRUE)
+> all_3 <- merge(all_2,pop,all=TRUE)
+> alldata <- merge(all_3,gdp,all=TRUE)
+
 ```
 
 ## Problem 1.6
@@ -94,6 +141,10 @@ Add a column to the consolidated table containing the continent for each country
 
 ```{r}
 # Your code goes here.
+> # left join for continent (used this option instead)
+> alldata_2 <- merge(alldata,continents,by.x="country",by.y="country",all.x=TRUE)
+> View(alldata_2)
+
 ```
 
 # Problem 2 
@@ -108,6 +159,35 @@ Report the child mortalilty rate in 2015 for these 5 pairs:
 
 ```{r}
 # Your code goes here.
+> all_mortal <- alldata_2[c(1:3)]
+
+> mortal_Sri_Lanka <- all_mortal[ which(all_mortal$country %in% ('Sri Lanka') & all_mortal$year=='X2015'),]
+> mortal_Turkey <- all_mortal[ which(all_mortal$country %in% ('Turkey') & all_mortal$year=='X2015'),]
+> mortal_Poland <- all_mortal[ which(all_mortal$country %in% ('Poland') & all_mortal$year=='X2015'),]
+>  mortal_South_Korea <- all_mortal[ which(all_mortal$country %in% ('South Korea') & all_mortal$year=='X2015'),]
+> mortal_Malaysia <- all_mortal[ which(all_mortal$country %in% ('Malaysia') & all_mortal$year=='X2015'),]
+> mortal_Russia <- all_mortal[ which(all_mortal$country %in% ('Russia') & all_mortal$year=='X2015'),]
+> mortal_Pakistan <- all_mortal[ which(all_mortal$country %in% ('Pakistan') & all_mortal$year=='X2015'),]
+> mortal_Vietnam <- all_mortal[ which(all_mortal$country %in% ('Vietnam') & all_mortal$year=='X2015'),]
+> mortal_Thailand <- all_mortal[ which(all_mortal$country %in% ('Thailand') & all_mortal$year=='X2015'),]
+> mortal_South_Africa <- all_mortal[ which(all_mortal$country %in% ('South Africa') & all_mortal$year=='X2015'),]
+
+> Sri_Turkey <- rbind(mortal_Sri_Lanka,mortal_Turkey)
+> View(Sri_Turkey)
+> # Sri Lanka has lower rate: 8.7 v 13.5
+> Poland_Korea <- rbind(mortal_Poland,mortal_South_Korea)
+> View(Poland_Korea)
+> # South Korea has lower rate: 3.5 v 5.2
+> Malaysia_Russia <- rbind(mortal_Malaysia,mortal_Russia)
+> View(Malaysia_Russia)
+> # Malaysia has lower rate: 8.2 v 9.6
+> Pakistan_Vietnam <- rbind(mortal_Pakistan,mortal_Vietnam)
+> View(Pakistan_Vietnam)
+> # Vietnam has lower rate: 21.7 v 81.1
+> Thailand_South_Africa <- rbind(mortal_Thailand,mortal_South_Africa)
+> View(Thailand_South_Africa)
+> # Thailand has lower rate: 12.3 v 42.1
+
 ```
 
 # Problem 3
@@ -120,6 +200,27 @@ Use `ggplot2` to create a plot of life expectancy versus fertiltiy for 1962 for 
 
 ```{r}
 # Your code goes here.
+> install.packages("ggplot2")
+> library(ggplot2)
+
+> alldata_1962 <- alldata_2[ which(alldata_2$year=='X1962'),]
+
+> # dropping observations with missing fertility/expectancy information
+> lifespan_fertility_2 <- alldata_1962[ which(alldata_1962$fertility> 0),]
+> lifespan_fertility_3 <- lifespan_fertility_2[ which(lifespan_fertility_2$life_expectancy> 0),]
+> # Oceania not required
+> lifespan_fertility_4 <- lifespan_fertility_3[ which(lifespan_fertility_3$continent != 'Oceania'),]
+
+> # convert population to numeric variable and use log to scale the relative sizes
+> lifespan_fertility_4$population2 <- as.numeric(lifespan_fertility_4$population)
+> ggplot(lifespan_fertility_4, aes(x=fertility,y=life_expectancy,color=continent)) + geom_point(aes(size=log(population2)))
+
+> # general relationship: lower fertility associated with higher life expectancy
+> # For 1962 data, Europe clustered around high life expectancy/low fertility
+> # Africa at other end of the spectrum: lower life expectancy/higher fertility
+> # countries in Asia/Americas more spread out along the relationship trendline
+> # Americas more evenly spaced, Asia perhaps more similar to Africa than Europe
+
 ```
 
 Do you see a dichotomy? Explain.
@@ -132,6 +233,14 @@ Learn about OECD and OPEC. Add a couple of columns to your consolidated tables c
 
 ```{r}
 # Your code goes here.
+> # make Excel list of OECD and OPEC indicators and load
+> OECD_OPEC <- read.csv("C:/R files/OECD_OPEC.csv")
+> View(OECD_OPEC)
+> # file has the OPEC and OECD countries + variables 'OPEC' and 'OECD' set equal to 1 if the country is a member of that organization
+
+
+> alldata_3 <- merge(alldata_2,OECD_OPEC,by.x="country",by.y="country",all.x=TRUE)
+
 ```
 
 ### Problem 3.3
@@ -140,6 +249,31 @@ Make the same plot as in Problem 3.1, but this time use color to annotate the OE
 
 ```{r}
 # Your code goes here.
+> alldata_1962 <- alldata_3[ which(alldata_3$year=='X1962'),]
+
+> # dropping observations with missing fertility/expectancy information
+> lifespan_fertility_2 <- alldata_1962[ which(alldata_1962$fertility> 0),]
+> lifespan_fertility_3 <- lifespan_fertility_2[ which(lifespan_fertility_2$life_expectancy> 0),]
+> # Oceania not required
+> lifespan_fertility_4 <- lifespan_fertility_3[ which(lifespan_fertility_3$continent != 'Oceania'),]
+
+> # split data into 3, create new category variable, re-stack
+> lifespan_fertility_4$newvar <- pmax(lifespan_fertility_4$OECD,lifespan_fertility_4$OPEC,na.rm=TRUE)
+> # convert NAs to zeroes
+> lifespan_fertility_4[is.na(lifespan_fertility_4)] <- 0
+> OPEC <- lifespan_fertility_4[ which(lifespan_fertility_4$OPEC=='1'),]
+> OECD <- lifespan_fertility_4[ which(lifespan_fertility_4$OECD=='1'),]
+> OTHERS <- lifespan_fertility_4[ which(lifespan_fertility_4$newvar=='0'),]
+> OPEC$category <- "OPEC"
+> OECD$category <- "OECD"
+> OTHERS$category <- OTHERS$continent
+> re_stack=rbind(OPEC,OECD,OTHERS)
+
+
+> # convert population to numeric variable and use log to scale the relative sizes
+> re_stack$population2 <- as.numeric(re_stack$population)
+> ggplot(re_stack, aes(x=fertility,y=life_expectancy,color=category)) + geom_point(aes(size=log(population2)))
+
 ```
 
 How would you describe the dichotomy?
@@ -151,6 +285,46 @@ Explore how this figure changes across time. Show us 4 figures that demonstrate 
 
 ```{r}
 # Your code goes here.
+> # data in 3.3 shows information in 1962
+> # will select 1975, 1990, 2000, 2015 as other years to observe
+> # below is code for 1975, repeats with the other 3 years; not re-copied here
+
+> alldata_1975 <- alldata_3[ which(alldata_3$year=='X1975'),]
+
+> # dropping observations with missing fertility/expectancy information
+> lifespan_fertility_2 <- alldata_1975[ which(alldata_1975$fertility> 0),]
+> lifespan_fertility_3 <- lifespan_fertility_2[ which(lifespan_fertility_2$life_expectancy> 0),]
+> # Oceania not required
+> lifespan_fertility_1975 <- lifespan_fertility_3[ which(lifespan_fertility_3$continent != 'Oceania'),]
+
+> # split data into 3, create new category variable, re-stack
+> lifespan_fertility_1975$newvar <- pmax(lifespan_fertility_1975$OECD,lifespan_fertility_1975$OPEC,na.rm=TRUE)
+> # convert NAs to zeroes
+> lifespan_fertility_1975[is.na(lifespan_fertility_1975)] <- 0
+> OPEC <- lifespan_fertility_1975[ which(lifespan_fertility_1975$OPEC=='1'),]
+> OECD <- lifespan_fertility_1975[ which(lifespan_fertility_1975$OECD=='1'),]
+> OTHERS <- lifespan_fertility_1975[ which(lifespan_fertility_1975$newvar=='0'),]
+> OPEC$category <- "OPEC"
+> OECD$category <- "OECD"
+> OTHERS$category <- OTHERS$continent
+> re_stack_1975=rbind(OPEC,OECD,OTHERS)
+
+
+> # convert population to numeric variable and use log to scale the relative sizes
+> re_stack_1975$population2 <- as.numeric(re_stack_1975$population)
+> ggplot(re_stack_1975, aes(x=fertility,y=life_expectancy,color=category)) + geom_point(aes(size=log(population2)))
+
+> # looking at the 4 years chosen
+> # the dichotomy between Africa and Europe/OECD is still present
+> # and appears more stark because of the greater relative progress by 
+> # Asia/America/OPEC countries toward the lower fertility/higher life expectancy   
+    zone.
+> # all groups seem to have moved in that general direction, but the improvement 
+> # in Africa seems not as much, so the original gap in 1962 has not closed.
+> # Also interesting that relative decline in fertility appears to precede the  
+> # increase in life expectancy when considering the whole population in the     > # graph.
+
+
 ```
 
 Would you say that the same dichotomy exists today? Explain:
@@ -161,6 +335,7 @@ Make an animation with the `gganimate` package.
 
 ```{r, eval=FALSE}
 # Your code goes here.
+# out of time, but will try it later!
 ```
 
 
@@ -172,6 +347,27 @@ Let's compare France and its former colony Tunisia. Make a plot of fertility ver
  
 ```{r}
 # Put your code here.
+
+> # select fertility data for France and Tunisia - all years; use gathered data
+> fertile_France_Tunisia <- fertile[ which(fertile$country %in% ('France') | fertile$country %in%  ('Tunisia')),]
+> # make plot
+> ggplot(data=fertile_France_Tunisia,aes(x=year,y=fertility,group=country,colour=country)) + geom_line() + scale_x_discrete(breaks = pretty_breaks(n=10))
+
+
+
+> # select life expectancy data for France and Tunisia - all years; use gathered data
+> life_France_Tunisia <- life[ which(life$country %in% ('France') | life$country %in%  ('Tunisia')),]
+> # make plot
+> ggplot(data=life_France_Tunisia,aes(x=year,y=life_expectancy,group=country,colour=country)) + geom_line() + scale_x_discrete(breaks = pretty_breaks(n=10))
+
+
+> # Looking at the graphs, can see that fertility in Tunisia has decreased
+> # almost to the level of France in last 60 years. Lifespan in Tunisia has been increasing at a 
+> # faster rate than France until recently, but lately it appears to have
+> # settled at a similar rate of increase, and a life expectancy gap persists.
+> # Interesting to see correlated dips in life expectancy at certain recent
+> # periods. May be related to colonial conflicts at that time.
+
 ```
 
 ## Problem 4.2
@@ -180,6 +376,62 @@ Do the same, but this time compare Vietnam to the OECD countries.
 
 ```{r}
 # Put your code here.
+
+> # merge OECD file with fertility data
+> fertile_2 <- merge(fertile,OECD_OPEC,by.x="country",by.y="country",all.x=TRUE)
+
+> # OECD countries data - compute average fertility
+> fertile_OECD <- fertile_2[ which( fertile_2$OECD == '1'),]
+> OECD_avg <- aggregate( fertility~year,fertile_OECD, mean  )
+> OECD_avg$name <- 'OECD'
+
+> # similar datastet but for Vietnam (Vietnam not OECD)
+> fertile_Vietnam <- fertile_2[ which( fertile_2$country %in% ('Vietnam')),]
+> Vietnam_avg <- aggregate( fertility~year,fertile_Vietnam, mean  )
+> Vietnam_avg$name <- 'Vietnam'
+
+> # create 1 time-series dataset via rbind
+> V_OECD_fertility <- rbind(OECD_avg,Vietnam_avg)
+
+> # make a plot
+> ggplot(data=V_OECD_fertility,aes(x=year,y=fertility,group=name,colour=name)) + geom_line() +  scale_x_discrete(breaks = pretty_breaks(n=10))
+
+> # While the OECD countries' fertility has generally declined over the period 
+> # in question, Vietnamese fertility had a mid-20th century "boom" that fell
+> # off sharply in the 1970s and 80s. Today, fertility levels are very similar
+> # between Vietnam and the OECD countries.
+
+> # Do similar with life expectancy…
+
+> # merge OECD file with life expectancy data
+> life_2 <- merge(life,OECD_OPEC,by.x="country",by.y="country",all.x=TRUE)
+
+> # OECD countries data - compute average life expectancy
+> life_OECD <- life_2[ which( life_2$OECD == '1'),]
+> OECD_avg <- aggregate( life_expectancy~year,life_OECD, mean  )
+> OECD_avg$name <- 'OECD'
+
+> # similar datastet but for Vietnam (Vietnam not OECD)
+> life_Vietnam <- life_2[ which( life_2$country %in% ('Vietnam')),]
+> Vietnam_avg <- aggregate( life_expectancy~year,life_Vietnam, mean  )
+> Vietnam_avg$name <- 'Vietnam'
+
+> # create 1 time-series dataset via rbind
+> V_OECD_life<- rbind(OECD_avg,Vietnam_avg)
+
+> # make a plot
+> ggplot(data=V_OECD_life,aes(x=year,y=life_expectancy,group=name,colour=name)) + geom_line() +  scale_x_discrete(breaks = pretty_breaks(n=10))
+
+
+> # Life expectancy has generally increased over time in both the OECD zone
+> # and in Vietnam. There are several sharp downward spikes in both regions
+> # however. 2 of the spikes are correlated, and it is possible they are due
+> # to the World Wars in which both OECD countries and Vietnam felt the 
+> # effects. One spike appears to impact Vietnam alone; could be due to the 
+> # Vietnam War conflict which did not draw in most OECD countries. OECD
+> # life expectancy is higher than for Vietnam, and the gap does not appear
+> # to be closing as of late.
+
 ```
 
 
