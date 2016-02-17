@@ -221,6 +221,8 @@ Use `ggplot2` to create a plot of life expectancy versus fertiltiy for 1962 for 
 > # countries in Asia/Americas more spread out along the relationship trendline
 > # Americas more evenly spaced, Asia perhaps more similar to Africa than Europe
 
+
+
 ```
 
 Do you see a dichotomy? Explain.
@@ -240,6 +242,7 @@ Learn about OECD and OPEC. Add a couple of columns to your consolidated tables c
 
 
 > alldata_3 <- merge(alldata_2,OECD_OPEC,by.x="country",by.y="country",all.x=TRUE)
+
 
 ```
 
@@ -272,7 +275,14 @@ Make the same plot as in Problem 3.1, but this time use color to annotate the OE
 
 > # convert population to numeric variable and use log to scale the relative sizes
 > re_stack$population2 <- as.numeric(re_stack$population)
+> re_stack<- re_stack[ which(re_stack$category != 'Europe'),]
 > ggplot(re_stack, aes(x=fertility,y=life_expectancy,color=category)) + geom_point(aes(size=log(population2)))
+
+> # The main dichotomy here in 1962 is between OECD and the other categories,
+> # especially Africa. The former has sharply higher life expectancy and
+> # lower fertility.
+
+
 
 ```
 
@@ -308,21 +318,23 @@ Explore how this figure changes across time. Show us 4 figures that demonstrate 
 > OECD$category <- "OECD"
 > OTHERS$category <- OTHERS$continent
 > re_stack_1975=rbind(OPEC,OECD,OTHERS)
+> re_stack_1975 <- re_stack_1975[ which(re_stack_1975$category != 'Europe'),]
 
 
 > # convert population to numeric variable and use log to scale the relative sizes
 > re_stack_1975$population2 <- as.numeric(re_stack_1975$population)
 > ggplot(re_stack_1975, aes(x=fertility,y=life_expectancy,color=category)) + geom_point(aes(size=log(population2)))
 
+> # [graphs pasted here in HW1 doc]
+
 > # looking at the 4 years chosen
-> # the dichotomy between Africa and Europe/OECD is still present
+> # the dichotomy between Africa and OECD is still present
 > # and appears more stark because of the greater relative progress by 
 > # Asia/America/OPEC countries toward the lower fertility/higher life expectancy   
     zone.
 > # all groups seem to have moved in that general direction, but the improvement 
-> # in Africa seems not as much, so the original gap in 1962 has not closed.
-> # Also interesting that relative decline in fertility appears to precede the  
-> # increase in life expectancy when considering the whole population in the     > # graph.
+> # in Africa seems not as much, so the original gap in 1962 has not completely closed.
+
 
 
 ```
@@ -368,6 +380,7 @@ Let's compare France and its former colony Tunisia. Make a plot of fertility ver
 > # Interesting to see correlated dips in life expectancy at certain recent
 > # periods. May be related to colonial conflicts at that time.
 
+
 ```
 
 ## Problem 4.2
@@ -401,7 +414,7 @@ Do the same, but this time compare Vietnam to the OECD countries.
 > # off sharply in the 1970s and 80s. Today, fertility levels are very similar
 > # between Vietnam and the OECD countries.
 
-> # Do similar with life expectancy…
+Do similar with life expectancy…
 
 > # merge OECD file with life expectancy data
 > life_2 <- merge(life,OECD_OPEC,by.x="country",by.y="country",all.x=TRUE)
@@ -432,6 +445,7 @@ Do the same, but this time compare Vietnam to the OECD countries.
 > # life expectancy is higher than for Vietnam, and the gap does not appear
 > # to be closing as of late.
 
+
 ```
 
 
@@ -445,6 +459,53 @@ Create a smooth density estimate of the distribution of GDP per capita per day a
 
 ```{r,warning=FALSE}
 # Your code goes here.
+
+> # select 1970 data from the aggregate dataset 
+> alldata_1970 <- alldata_3[ which(alldata_3$year=='X1970'),]
+ 
+> # compute the GDP per country per day 
+> # 365 days; computed where possible
+> alldata_1970$pop <- as.numeric(alldata_1970$population)
+> alldata_1970$GDP_pp_day <- (alldata_1970$gdp / alldata_1970$pop) / 365
+
+> # introduce the 5 categories
+
+> # first subset OPEC, OECD, others
+> OPEC <- alldata_1970[ which(alldata_1970$OPEC=='1'),]
+> OECD <- alldata_1970[ which(alldata_1970$OECD=='1'),]
+> # now set indicator NAs to 0 to select out the OTHERS file
+> library(dplyr)
+> alldata_1970 <- alldata_1970 %>% mutate(OPEC = ifelse(is.na(OPEC),0,OPEC))
+> alldata_1970 <- alldata_1970 %>% mutate(OECD = ifelse(is.na(OECD),0,OECD))
+> OTHERS <- alldata_1970[ which(alldata_1970$OPEC=='0' &  
+  alldata_1970$OECD=='0'),]
+
+
+> # full data with OECD/OPEC/continents otherwise 
+> OPEC$category <- "OPEC"
+> OECD$category <- "OECD"
+> OTHERS$category <- OTHERS$continent
+> re_pack_1970=rbind(OPEC,OECD,OTHERS)
+
+> # remove where GDP_pp_day cannot be determined from missing data
+> # remove Oceania
+> # remove cases of nonpositive ('NA') values of population for the weighting
+
+> re_pack_1970_2 <-  re_pack_1970[ which(re_pack_1970$pop > 0 & re_pack_1970$GDP_pp_day > 0 & re_pack_1970$category != 'Oceania'),]
+
+> library(ggplot2)
+
+
+> # make a weighted plot
+
+> ggplot(re_pack_1970_2, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+
+> # note: also did this without the population weighting
+> # in that case there was visible data at a higher end of the density
+> # but it disappears with the weighting due to the smaller population sizes
+> # of countries with higher GDP per person per day in 1970
+
+
 ```
 
 ## Problem 5.2
@@ -453,6 +514,95 @@ Now do the same but show each of the five groups separately.
 
 ```{r,warning=FALSE}
 # Your code goes here.
+
+> # break into the 5 specified groups
+
+> OECD_1970 <-  re_pack_1970_2[ which(re_pack_1970_2$category == 'OECD'),]
+> OPEC_1970 <-  re_pack_1970_2[ which(re_pack_1970_2$category == 'OPEC'),]
+> AFRICA_1970 <-  re_pack_1970_2[ which(re_pack_1970_2$category == 'Africa'),]
+> ASIA_1970 <-  re_pack_1970_2[ which(re_pack_1970_2$category == 'Asia'),]
+> AMERICA_1970 <-  re_pack_1970_2[ which(re_pack_1970_2$category == 'Americas'),]
+
+
+> # make the group plots
+
+> ggplot(OECD_1970, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+> ggplot(OPEC_1970, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+> ggplot(AFRICA_1970, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+> ggplot(ASIA_1970, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+> ggplot(AMERICA_1970, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+
+> # Looking at these 1970 densities, in the OPEC and OECD groups, it looks
+> # like the more populous nations are also the highest in GDP/person/day.
+> # there is a bimodal shape for Africa, with some high-GDP area relative
+> # to the rest (South Africa). Both Asia and the Americas in 1970 had
+> # most of their populations in countries with low GDP/person/day.
+
+> # for this exercise I will look at these densities for the years
+> # 1990 and 2010 as well.
+> 
+> # The code can be repeated as above (not copied here) except that the year
+> # can be changed to obtain the relevant dataset.
+
+ 
+
+
+> # To visualize trends more directly, I am going to stack the 1970, 1990 and
+> # 2010 data points into a single dataset and consider "year" as an 
+> # additional category
+
+> # to compare the visuals, I will show the densities over time for the 
+> # entire group (excludes Oceania) and, as a further example, the Africa 
+> # and OECD regions for the years 1970, 1990 and 2010. 
+
+> # Although the densities will not each = 1, I will also show an overlay
+> # graph containing the densities over the 3 years observed both overall and
+> # in Africa and OECD. It can be useful for spotting general trends over time.
+
+
+
+> ggplot(re_pack_1970_2, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+> ggplot(re_pack_1990_2, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+> ggplot(re_pack_1990_2, aes(x=GDP_pp_day,weight=pop/sum(pop))) + geom_density()
+
+> # [some graphs are pasted here in the original assignment ]
+
+> # do an overlay
+
+> master_data <- rbind(re_pack_1970_2,re_pack_1990_2,re_pack_2010_2)
+> ggplot(master_data, aes(x=GDP_pp_day,weight=pop/sum(pop),colour=year)) + geom_density()
+
+
+> # [more pasted graphs]
+
+> # Conditional on the available data for this exercise, it appears that the
+> # distribution of this GDP measure has become less balanced over time,
+> # showing increasing density at both the higher and (especially) lower
+> # ends of the distribution. It also suggests that the high population
+> # countries are more likely to show low GDP/person/day levels in 2010 than
+> # in 1970.
+
+> # For the Africa and OECD data, I will just show the overlays:
+
+> master_Africa <-  master_data[ which(master_data$category == 'Africa'),]
+> master_OECD <-  master_data[ which(master_data$category == 'OECD'),]
+
+> # [more pasted graphs]
+
+> # The growing dispersion of the GDP measure is evident in the above graph.
+
+> # [more pasted graphs]
+
+> # In the OECD, there is less "inequality" in all years observed than we see
+> # in both the general and Africa cases. However, there is again a shifting 
+> # over time as well, but in a different way: a redistribution away from the 
+> # lower ranges toward the higher levels. Some OECD countries are 
+> # doing very well in 2010, and fewer are doing poorly. 
+
+
+
+
+
 ```
 
 
