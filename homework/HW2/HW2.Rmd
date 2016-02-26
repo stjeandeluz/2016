@@ -30,9 +30,9 @@ Let's make a quick sampling model for this simple version of roulette. You are g
 +          #N is number of spins of the wheel. Probabilities as stated. Outcomes are therefore
 +                   results <- sample( c(1,-1), N, replace=TRUE, prob=c(9/19,10/19))
 +                   # total earnings are
-+                           N_S <- sum(results)
-+                         avg <- N_S/N
-+                          list(spins=N, results=results, tot_earnings=N_S, avg_earn_spin=avg)
++                           S_N <- sum(results)
++                         avg <- S_N/N
++                          list(spins=N, results=results, tot_earnings=S_N, avg_earn_spin=avg)
 +                           }
 > get_outcome(5)
 > # NOTE: please remove 'results' listing if there are a large number of input spins!
@@ -43,28 +43,152 @@ Let's make a quick sampling model for this simple version of roulette. You are g
 Use Monte Carlo simulation to study the distribution of total earnings $S_N$ for $N=10,25,100,1000$. That is, study the distribution of earnings for different number of plays. What are the distributions of these two random variables? How do the expected values and standard errors change with $N$? Then do the same thing for the average winnings $S_N/N$. What result that you learned in class predicts this?
 
 ```{r}
-##Your code here
+> # reviewing the distributions of both total winnings and average winnings given N spins
+> # so will examine the mean and standard error of both variables for N spins
+> # via Monte Carlo simulation (using 10,000 replications of N spins)
 
-# distribution gives a mean and SD
-# crunch for both
+> # constant values
+> mu <- -1/19
+> sigma <- 2*sqrt(9/19*10/19)
 
+> # Monte Carlo simulation for TOTAL earnings as a function of N spins
+> 
+> # code shown for 10 spins; repeated with values of N=25, 100, 1000 (only partial code shown for other values)
+> spins <- 10
+>  values_tot <- replicate (10^4, {
++          X <- sample( c(1,-1), spins, replace=TRUE, prob=(c(9/19,10/19))   )
++          sum(X)
++      })
+> mean(values_tot)
+[1] -0.455
+> sample_se <- sqrt(spins)*sigma
+> sample_se
+[1] 3.157895
+
+> spins <- 25
+> mean(values_tot)
+[1] -1.3044
+> sample_se <- sqrt(spins)*sigma
+> sample_se
+[1] 4.99307
+
+> spins <- 100
+> values_tot <- replicate (10^4, {
++                       X <- sample( c(1,-1), spins, replace=TRUE, prob=(c(9/19,10/19))   )
++                      sum(X)
++                  })
+> mean(values_tot)
+[1] -5.1748
+> sample_se <- sqrt(spins)*sigma
+> sample_se
+[1] 9.98614
+
+> spins <- 1000
+> mean(values_tot)
+[1] -52.6252
+> sample_se <- sqrt(spins)*sigma
+> sample_se
+[1] 31.57895
+
+> # As this game is played more, the negative expected payoff per spin, -1/19 dollars, is magnified as you play. Expected losses grow until you stop playing. 
+> # The standard error also grows as the range of possible results increases once you have had more time to play.
+
+
+> # Monte Carlo simulation for AVERAGE earnings as a function of N spins
+
+> # code shown for 10 spins; repeated with values of N=25, 100, 1000 (only partial code shown for other values)
+
+> spins <- 10
+> values_avg <- replicate (10^4, {
++                                                   X <- sample( c(1,-1), spins, replace=TRUE, prob=(c(9/19,10/19))   )
++                                                   mean(X) - mu
++                                            })
+> mean(values_avg)
+[1] -0.004928421
+> sample_se <- sigma/sqrt(spins)
+> sample_se
+[1] 0.3157895
+
+> spins <- 25
+> mean(values_avg)
+[1] -0.0001844211
+> sample_se <- sigma/sqrt(spins)
+> sample_se
+[1] 0.1997228
+
+> spins <- 100
+> mean(values_avg)
+[1] 0.0005415789
+> sample_se <- sigma/sqrt(spins)
+> sample_se
+[1] 0.0998614
+
+> spins <- 1000
+> mean(values_avg)
+[1] 0.0002347789
+> sample_se <- sigma/sqrt(spins)
+> sample_se
+[1] 0.03157895
+
+> # as the number of spins increases, the average payoff at the end end is closer to the "true" payoff of $ -1/19 given the odds of the game.
+> # The standard error of the sample mean decreases as the sample mean gets closer to the true mean when you play more.
 ```
 
-Your answer here.
+(note I also put some comments in the code)
+
+The results we see here for the average payoff conform to the law of large numbers as there are more spins and average payoff after playing the game gets closer to the expected payoff under the (assumed) exact properties of the roulette wheel. 
 
 
 ## Problem 1C
 
 What is the expected value of our sampling model? What is the standard deviation of our sampling model?
 
-Your answer here.
+The expected value of payoff to the player is [9/19*(1) + 10/19*(-1)] or -1/19 dollars each time they play.
+Because the outcomes are -1 or 1 dollar change in net position, the standard deviation for the binomial distribution 
+here is 2*sqrt(spins)*sqrt[(10/19)*(9/19)] or about 0.998613998*sqrt(spins) for N number of spins.
+
 
 ## Problem 1D
 
 Use CLT to approximate the probability that the casino loses money when you play 25 times. Then use a Monte Carlo simulation to confirm.
 
 ```{r}
-##Your code here
+> # The casino loses money when you win, so they have 9/19 chance of losing and 10/19 chance of winning.
+> # Question is same as what are the odds you come out ahead. Same as what are chances you gross $13 or more/ win 13+ times.
+> 
+> # We know sigma is 2*sqrt(9/19*10/19). Standard error is this amount times sqrt(25), or 5, so 10*sqrt(9/19*10/19).
+
+> # Using CLT, can develop a Z score. Want probability that you win at least 13 times. 
+> # Z = [13 - (9/19)*25]  /   10*sqrt(9/19*10/19)   is the Z score distributed ~N(0,1)
+
+> top <-  (13 - ((9*25)/19))
+> top
+[1] 1.157895
+> bottom <- (10)*sqrt(9/19*10/19)
+> bottom
+[1] 0.1997228
+> Z <- top / bottom
+> Z
+[1] 0.2319004
+> pnorm(Z)
+[1] 0.5916923
+
+> # So there is about a 40% chance you can do as least as well as 13 games and cause a loss for the casino.
+> # In other words, with 25 spins it is a 40% chance the casino would take a loss. 
+
+> # generate a Monte Carlo sample and look at the Z scores
+error <- replicate(B,{
++          X <- sample( c(-1,1), N, replace=TRUE, prob=(c(10/19,9/19)) )
++          sum(X)
++      })
+
+> # SUM above are your net gains, what is probability they are positive?
+> mean (error > 0)
+[1] 0.3971
+
+> # This roughly matches the CLT computaions above.
+
+
 ```
 
 
