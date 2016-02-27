@@ -26,6 +26,7 @@ you realize that the chance of red or black are both slightly less than 1/2. The
 Let's make a quick sampling model for this simple version of roulette. You are going to bet a dollar each time you play and always bet on black. Make a box model for this process using the `sample` function. Write a function `get_outcome` that takes as an argument the number of times you play $N$ and returns your earnings $S_N$.
 
 ```{r}
+
 > get_outcome <- function(N) {
 +          #N is number of spins of the wheel. Probabilities as stated. Outcomes are therefore
 +                   results <- sample( c(1,-1), N, replace=TRUE, prob=c(9/19,10/19))
@@ -153,7 +154,7 @@ here is 2*sqrt(spins)*sqrt[(10/19)*(9/19)] or about 0.998613998*sqrt(spins) for 
 Use CLT to approximate the probability that the casino loses money when you play 25 times. Then use a Monte Carlo simulation to confirm.
 
 ```{r}
-> # The casino loses money when you win, so they have 9/19 chance of losing and 10/19 chance of winning.
+> # The casino loses money when you win, and they have 9/19 chance of losing and 10/19 chance of winning in a spin.
 > # Question is same as what are the odds you come out ahead. Same as what are chances you gross $13 or more/ win 13+ times.
 > 
 > # We know sigma is 2*sqrt(9/19*10/19). Standard error is this amount times sqrt(25), or 5, so 10*sqrt(9/19*10/19).
@@ -176,7 +177,9 @@ Use CLT to approximate the probability that the casino loses money when you play
 > # So there is about a 40% chance you can do as least as well as 13 games and cause a loss for the casino.
 > # In other words, with 25 spins it is a 40% chance the casino would take a loss. 
 
-> # generate a Monte Carlo sample and look at the Z scores
+
+
+> # generate a Monte Carlo sample and compare toPrProb <-  the Z scores
 error <- replicate(B,{
 +          X <- sample( c(-1,1), N, replace=TRUE, prob=(c(10/19,9/19)) )
 +          sum(X)
@@ -186,7 +189,7 @@ error <- replicate(B,{
 > mean (error > 0)
 [1] 0.3971
 
-> # This roughly matches the CLT computaions above.
+> # This roughly matches the CLT computations above.
 
 
 ```
