@@ -215,7 +215,7 @@ In general, what is the probability that the casino loses money as a function of
 +         DATA[i] <- prob 
 +          }
 
-
+> plot(DATA, xlab="spins",ylab="Pr(Casino loses)")
 ```
 
 DATA contains the probability the casino will lose money given the number of spins of the wheel in a series of plays. It follows a curve decreasing at a decreasing rate. (note: am having trouble pasting in the graph, so will describe).
