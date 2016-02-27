@@ -201,10 +201,25 @@ error <- replicate(B,{
 In general, what is the probability that the casino loses money as a function of $N$? Make a plot for values ranging from 25 to 1,000. Why does the casino give you free drinks if you keep playing?
 
 ```{r}
-##Your code here
+> for(spins in 25:1000) {
++                   i <- spins - 24 
++         error <- replicate(10^4,{
++             X <- sample( c(-1,1), spins, replace=TRUE, prob=(c(10/19,9/19)))
++                     sum(X)
++     })
++         prob <- mean(error > 0)  
++         DATA[i] <- prob 
++          }
+
+
 ```
 
-Your answer here. 
+DATA contains the probability the casino will lose money given the number of spins of the wheel in a series of plays. It follows a curve decreasing at a decreasing rate. (note: am having trouble pasting in the graph, so will describe).
+
+At low N, you can see that there is more chance for player to make money (and casino to lose it) when there is an odd number
+# of spins in the game. It is less noticeable for large N, where there is convergence to 0 (casino will almost surely win if the
+player keeps on playing - hence the free drinks, comped room, etc.)
+ 
 
 # Problem 2 
 
