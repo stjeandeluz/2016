@@ -245,7 +245,7 @@ Your bank gives out 1,000 loans this year. Create a sampling model and use the f
 + }  )
 > # The above single run of code showed 21 losses, so the bank would lose 21 * $120,000  or $2.52 million from default
 
-> # This result is fairly close to the expected 20 defaults. More replications should an even closer average:
+> # This result is fairly close to the expected 20 defaults. More replications should show an even closer average:
 > outcome <- replicate (10^4, {
 + L <- sample (c(0,1), loans, replace=TRUE, prob=(c(49/50,1/50))  )
 + sum(L)
