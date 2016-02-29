@@ -234,7 +234,24 @@ You run a bank that has a history of identifying potential homeowners that can b
 Your bank gives out 1,000 loans this year. Create a sampling model and use the function `sample` to simulate the number of foreclosure in a year with the information that 2% of customers default. Also suppose your bank loses $120,000 on each foreclosure. Run the simulation for one year and report your loss.
 
 ```{r}
-##your code here
+> # Doing a sample model for a single year of loans, modelling a default as 1, with 1/50 probability, else no default
+> # sum up the '1' values and multiply by $120k to get $ losses for the year
+ 
+> loans <- 1000
+
+> outcome <- replicate (1, {
++ L <- sample (c(0,1), loans, replace=TRUE, prob=(c(49/50,1/50))  )
++ sum(L)
++ }  )
+> # The above single run of code showed 21 losses, so the bank would lose 21 * $120,000  or $2.52 million from default
+
+> # This result is fairly close to the expected 20 defaults. More replications should an even closer average:
+> outcome <- replicate (10^4, {
++ L <- sample (c(0,1), loans, replace=TRUE, prob=(c(49/50,1/50))  )
++ sum(L)
++ }   )
+> mean(outcome)
+[1] 20.0116
 ```
 
 ## Problem 2B
