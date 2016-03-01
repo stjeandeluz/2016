@@ -496,7 +496,19 @@ We were able to set an interest rate of about 2% that guaranteed a very low prob
 The pool of borrowers they found had a much higher default rate, estimated to be $p=0.05$. What interest rate would give these companies the same expected profit as your bank (Answer to 2E)? 
 
 ```{r}
-##your code here
+
+> # To simplify, since the expected profit from before was very near $1.7MM, I will assume it exactly that amount for the calculations
+> # As before, bank makes expected profit EP = 1000 *  [(1-p)*180k*int   +   p*(-120k)]
+> # here p is .05 or 1/20
+> # set EP = $1.7MM and solve
+> amount1 <- (19/20)*180000*1000
+> amount2 <- (1/20)*(-120000)*1000
+> # so amount1*int + amount2 = $1.7MM   so   int = [$1.7MM - amount2] / amount1
+> ans <- 1700000 - amount2
+> ans <- ans / amount1
+> ans
+[1] 0.04502924
+> # so need to make the interest rate about 4.5%
 ```
 
 ## Problem 3B 
