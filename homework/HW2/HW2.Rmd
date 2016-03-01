@@ -480,7 +480,7 @@ Hint: See if the disparity is smaller for larger values of $p$. Also check for p
 [1] 0.8984
 ```
 
-When I ran the code above, I was first varying the interest rate above and below the optimum 2.32%. At 5% there was virtually 0% chance of a loss via MC, and plugging into the -EP/SE formula yielded Z score > 3.5, with a small but positive probability of loss (so tiny difference between Z and MC probabilities). Doing similar for a rate of 1% yielded a Z score of 1.17, with loss probability 87.9%, with a greater difference ( the mean MC chance of loss was 89.8% ). So as interest rate increases, the difference is smaller. Because we set it to minimize loss by an exacting criterion, setting it even higher will make positive profit even more assured, under MC or CLT. 
+When I ran the code above, I was first varying the interest rate above and below the optimum 2.32%. At 5% there was virtually 0% chance of a loss via MC, and plugging into the -EP/SE formula (not shown here; see 2E) yielded Z score > 3.5, with a small but positive probability of loss (so tiny difference between Z and MC probabilities). Doing similar for a rate of 1% yielded a Z score of 1.17, with loss probability 87.9%, with a greater difference ( the mean MC chance of loss was 89.8% ). So as interest rate increases, the difference is smaller. Because we set it to minimize loss by an exacting criterion, setting it even higher will make positive profit even more assured, under MC or CLT. 
 
 Looking at it from the same interest rate but changing the probability of default, when the probability is only 1%, The Z score > 4 so there is a small but positive difference in the Z and the MC result of 0. When the probability increases to 5%, there is a Z score of 2.38 with associated loss probability of .9913 vs. .9927 in the Monte Carlo run. Like before, when the interest rate is set "hard" to minimize long-run losses at Pr=.001 , making losses even more unlikely (less default), will make it easier for both methods to agree.
 
@@ -509,6 +509,7 @@ The pool of borrowers they found had a much higher default rate, estimated to be
 > ans
 [1] 0.04502924
 > # so need to make the interest rate about 4.5%
+> # note this assumes they are also making 1000 loans each year
 ```
 
 ## Problem 3B 
@@ -516,9 +517,34 @@ The pool of borrowers they found had a much higher default rate, estimated to be
 At the interest rate calculated in 3A what is the probability of negative profits? Use both the normal approximation and then confirm with a Monte Carlo simulation.
 
 ```{r}
-##your code here
-```
 
+> # Using CLT, want to know what is the Z value associated with 0 profits, given that EP = $1.7MM, then see probability area below the Z value
+> # TOP of Z value = 0 - EP = -$1.7MM
+> # BOTTOM of Z value is the SE
+> # from problems 2E and 3A, SE = sqrt(1000)*abs(180k*.045 + 120k)*sqrt(1/20*19/20)
+> ans <- sqrt(1000*1/20*19/20)
+> ans <- ans*((180000*.045) + 120000)
+> SE <- ans
+> Z <- -1700000 / SE
+> Z
+[1] -1.925542
+> pnorm(Z)
+[1] 0.0270808
+> # so there is about a 3% chance of negative profits
+
+> # Using Monte Carlo method:
+> # noting expected profit = .045*180k  = 8100 for each loan that doesnt go bad
+> MC <- replicate(10^4,{
++               X <- sample( c(-120000,8100), 1000, replace=TRUE, prob=(c(1/20,19/20)) )
++               sum(X)
++           })
+> 
+> 
+> mean (MC < 0)
+[1] 0.0305
+# This says there is about 3% chance that profits will be negative; equivalent to Z-score result.
+
+```
 ## Problem 3C 
 
 Note that the probability is much higher now. This is because the standard deviation grew. The companies giving out the loans did not want to raise interest rates much more since it would drive away clients. Instead they used a statistical approach. They increased $N$. How large does $N$ need to be for this probability to be 0.001? Use the central limit approximation and then confirm with a Monte Carlo simulation.
