@@ -440,11 +440,52 @@ Hint: See if the disparity is smaller for larger values of $p$. Also check for p
 
 
 ```{r}
-##your code here
+> # As noted, the loss probability is a bit higher. Using the hints, will use the MC model of Problem 2E and toggle the probabilities/Z score.
+> # Chance of default = 5% with same interest rate:
+> 
+> profit <- replicate(10^4,{
++                                            P <- sample( c(-120000,4176), 1000, replace=TRUE, prob=(c(1/20,19/20)) )
++                                             sum(P)
++                                         })
+> 
+> mean(profit < 0)
+[1] 0.9927
+
+> # Chance of default = 1% with same interest rate:
+> profit <- replicate(10^4,{
++                                                      P <- sample( c(-120000,4176), 1000, replace=TRUE, prob=(c(1/100,99/100)) )
++                                                       sum(P)
++                                                   })
+> mean (profit < 0)
+[1] 0
+
+
+> # Varying the interest rate now.
+> # interest rate = 5% with original probabilities:
+> # outcome for non-defaults = .05 * 180k = 9k
+> profit <- replicate(10^4,{
++                                                P <- sample( c(-120000,9000), 1000, replace=TRUE, prob=(c(1/50,49/50)) )
++                                                  sum(P)
++                                              })
+> mean(profit < 0)
+[1] 0
+> # interest rate = 1% with original probabilities:
+> # outcome for non-defaults = .01 * 180k = 1800
+>  profit <- replicate(10^4,{
++                                                          P <- sample( c(-120000,1800), 1000, replace=TRUE, prob=(c(1/50,49/50)) )
++                                                            sum(P)
++                                                       })
+> 
+> mean(profit < 0)
+[1] 0.8984
 ```
 
+When I ran the code above, I was first varying the interest rate above and below the optimum 2.32%. At 5% there was virtually 0% chance of a loss via MC, and plugging into the -EP/SE formula yielded Z score > 3.5, with a small but positive probability of loss (so tiny difference between Z and MC probabilities). Doing similar for a rate of 1% yielded a Z score of 1.17, with loss probability 87.9%, with a greater difference ( the mean MC chance of loss was 89.8% ). So as interest rate increases, the difference is smaller. Because we set it to minimize loss by an exacting criterion, setting it even higher will make positive profit even more assured, under MC or CLT. 
 
-Your answer here.
+Looking at it from the same interest rate but changing the probability of default, when the probability is only 1%, The Z score > 4 so there is a small but positive difference in the Z and the MC result of 0. When the probability increases to 5%, there is a Z score of 2.38 with associated loss probability of .9913 vs. .9927 in the Monte Carlo run. Like before, when the interest rate is set "hard" to minimize long-run losses at Pr=.001 , making losses even more unlikely (less default), will make it easier for both methods to agree.
+
+The discrepancy seems to come when you ease up on the criteria to "ensure" positive profit (higher default and/or lower interest rate). There is a greater range of outcomes that can realistically occur. CLT/Z score gives their probabilities based on infinite trials, whereas MC has a fixed number of draws, now with more possible outcomes, which would increase the standard error in relation to what can be approximated with the Z tables for those outcomes. It seems that the decreased precision shows up in the different probabilities under the 2 methods. 
+
 
 ## Problem 3
 
