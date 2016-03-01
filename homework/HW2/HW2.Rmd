@@ -549,9 +549,41 @@ At the interest rate calculated in 3A what is the probability of negative profit
 
 Note that the probability is much higher now. This is because the standard deviation grew. The companies giving out the loans did not want to raise interest rates much more since it would drive away clients. Instead they used a statistical approach. They increased $N$. How large does $N$ need to be for this probability to be 0.001? Use the central limit approximation and then confirm with a Monte Carlo simulation.
 
-Your answer here.
+This is like problem 2E but now N is what we need to know. We have interest rate of 4.5% and a probability of default of 5%. From Z tables, get Z-score such that .001 of the area is below it (that is a Z-score of -3.09) and that should be equivalent to the point of zero profits. In other words, using CLT, what N will get that Z-score given the properties of the loan market?
+
+As before, we can compute -EP/SE  =  -3.09     or   EP/SE  = 3.09 and solve for N. 
+
+Below code does that and then confirms via Monte Carlo. 
+
 ```{r}
-###your code here
+> # As before, want [0 -EP] / SE  = - 3.09   or  EP/SE = 3.09   What N can achieve this?
+
+> # expected profit EP = N *  [(1-p)*180k*int   +   p*(-120k)]
+> # or: N * ((19/20*180000*.045) + (1/20*-120000))
+> a1 <- ((19/20*180000*.045) + (1/20*-120000))
+> # so a1*N = expected profit
+> # SE = sqrt(N)*sqrt(1/20*19/20)*abs((180000*.045) + 120000)
+> a2 <- sqrt(1/20*19/20)*((180000*.045) + 120000)
+> # so now (a1*N) / (a2 * sqrt(N))   =   3.09
+> # same as (a1/a2)*sqrt(N) = 3.09   or  sqrt(N) = 3.09*(a2/a1) or N = (a2/a1)^2 * (3.09)^2
+
+> A <- (a2/a1)^2
+> B <- 3.09^2
+> N <- A*B
+> N
+[1] 2590.415
+> # So this would require making about 2,600 loans that year.
+
+> # Check this with Monte Carlo:
+ 
+> MC <- replicate(10^4,{
++                    X <- sample( c(-120000,8100), 2590, replace=TRUE, prob=(c(1/20,19/20)) )
++                    sum(X)
++                })
+> 
+> mean(MC < 0)
+[1] 0.0023
+> # which still has the same value as before when comparing to the Z probability. Close, but some imprecision (see Question 2F).
 ```
 
 So by doubling the number of loans we were able to reduce our risk! Now, for this to work, all the assumptions in our model need to be approximately correct, including the assumption that the probability of default was **independent**. This turned out to be false and the main reason for the under estimation of risk.
