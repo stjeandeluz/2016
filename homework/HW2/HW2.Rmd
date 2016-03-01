@@ -411,13 +411,26 @@ EP = 1000  * (  [180k*int]*49/50  +  [-120k]*1/50  )
 SE = SD*sqrt(1000)   =   sqrt(1000)*abs(180k*int + 120k)*sqrt(1/50*49/50)
 
 Using CLT, we can get a Z score for profit level where .001 of the area is to the left of the Z score corresponding to zero
-profits. That Z score is -3.09. What interest rate goes with that? Profit here is 0, so Z score = 0-EP/SE as above.
-Solving for -EP/SE = -3.09 gives int = 2.32%. Plugging into expected profit yields EP just under $1.7 million.
+profits. That Z score is -3.09. What interest rate goes with that? Profit at Z=-3.09 is 0, so Z score = 0-EP/SE as above.
+Solving for -EP/SE = -3.09 gives int = 2.32%. Plugging into expected profit equation yields EP just under $1.7 million.
 
 
 
 ```{r}
-###your code here
+> # With interest rate = 2.32% the bank makes about $4176 (.0232*$180k) off the loans that dont go bad. 
+> # Monte Carlo profit simulation:
+
+> profit <- replicate(10^4,{
++                                       P <- sample( c(-120000,4176), 1000, replace=TRUE, prob=(c(1/50,49/50)) )
++                                        sum(P)
++                                    })
+> mean(profit)
+[1] 1698267
+
+> mean(profit < 0)
+[1] 0.0023
+
+> # mean is close to predicted but the probability of loss is a bit higher
 ```
 
 ## Problem 2F
