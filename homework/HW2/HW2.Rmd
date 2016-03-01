@@ -322,7 +322,11 @@ Note that the loss you will incur is a random variable. Use Monte Carlo simulati
 
 The 1,000 loans you gave out were for $180,000. The way your bank can give out loans and not lose money is by charging an interest rate. If you charge an interest rate of, say, 2% you would earn $3,600 for each loan that doesn't foreclose. At what percentage should you set the interest rate so that your expected profit totals $100,000. Hint: Create a sampling model with expected value 100 so that when multiplied by the 1,000 loans you get an expectation of $100,000. Corroborate your answer with a Monte Carlo simulation.
 
-Your solution here. 
+From before, we know that the expected loss is $2.4 million. To expect to make $100k, the bank needs to make $2.5 million off the
+980 loans not defaulting. $2.5MM/980 = $2551 profit per good loan. Since the loans are for $180k, this implies an interest rate of
+$2551/$180k, about 1.4%.
+
+
 ```{r}
 ###your code here
 ```
