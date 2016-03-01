@@ -404,7 +404,17 @@ Note that the probability of losing money is quite high. To what value would you
 
 Hint: Use the following short cut. If $p$ fraction of a box are $a$s and $(1-p)$ are $b$s, then the SD of the list is $\mid a-b \mid \sqrt{p(1-p)}$ 
 
-Your solution here.
+(I admit I was slowly getting here ... thanks for the boost in the GitHub discussion!)
+
+As noted in the discussion, the interest rate "int" is not known and needs to be set. Expected profits over the loans are:
+EP = 1000  * (  [180k*int]*49/50  +  [-120k]*1/50  )
+SE = SD*sqrt(1000)   =   sqrt(1000)*abs(180k*int + 120k)*sqrt(1/50*49/50)
+
+Using CLT, we can get a Z score for profit level where .001 of the area is to the left of the Z score corresponding to zero
+profits. That Z score is -3.09. What interest rate goes with that? Profit here is 0, so Z score = 0-EP/SE as above.
+Solving for -EP/SE = -3.09 gives int = 2.32%. Plugging into expected profit yields EP just under $1.7 million.
+
+
 
 ```{r}
 ###your code here
