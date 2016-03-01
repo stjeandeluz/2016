@@ -179,7 +179,7 @@ Use CLT to approximate the probability that the casino loses money when you play
 
 
 
-> # generate a Monte Carlo sample and compare toPrProb <-  the Z scores
+> # generate a Monte Carlo sample and compare to the Z scores
 error <- replicate(B,{
 +          X <- sample( c(-1,1), N, replace=TRUE, prob=(c(10/19,9/19)) )
 +          sum(X)
@@ -385,7 +385,17 @@ $avg_profit
 In problem 2C, you were able to set a very low interest rate. Your customers will be very happy and you are expected to earn $100,000 in profits. However, that is just an expectation. Our profit is a random variable. If instead of a profit your bank loses money, your bank defaults. Under the conditions of Problem 2C, what is the probability that your profit is less than 0?
 
 ```{r}
-##your code here
+> # Using the model we just made, see what is the probability that the average (or total, same idea) is less than zero?
+
+>  profit <- replicate(10^4,{
++                              P <- sample( c(-120000,2556), 1000, replace=TRUE, prob=(c(1/50,49/50)) )
++                              mean(P)
++                          })
+> 
+> mean(profit < 0)
+[1] 0.4357
+
+> # This is quite a high chance, 44%, the bank may not be comfortable with that.
 ```
 
 ## Problem 2E
