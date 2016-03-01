@@ -328,7 +328,55 @@ $2551/$180k, about 1.4%.
 
 
 ```{r}
-###your code here
+> # For this part I write a function that uses the given default probabilities, and computes the expected return for an input interest rate.
+> # Method is to start from 2% and grid search in direction until inputting an interest rate gives an average profit per outstanding loan of ~$100.
+> # (I admit the answer I just wrote is telling me what direction to go in!)
+> # Note that although there are 1000 loans, since it is average I am looking at, I used 10^5 as series argument to get more precision for the average.
+
+> outcome <- function(int) {
++                                              profit <- sample( c(int*180000,-120000), 10^5, replace=TRUE, prob=c(49/50,1/50))
++                                                             
++                                                                                                  sum <- sum(profit)
++                                                                                                        avg <- sum/10^5
++                                                                                                                               list(avg_profit=avg)
++                                                                                                                               }
+> outcome(.02)
+$avg_profit
+[1] 1167.552
+
+> outcome(.01)
+$avg_profit
+[1] -553.176
+
+> outcome(.015)
+$avg_profit
+[1] 217.779
+
+> outcome(.014)
+$avg_profit
+[1] 68.3748
+
+> outcome(.0145)
+$avg_profit
+[1] 182.322
+
+> outcome(.0142)
+$avg_profit
+[1] 179.6392
+
+> outcome(.0141)
+$avg_profit
+[1] 7.5903
+
+> #With a rate of 1.42% (rough estimate), the expected return on a good loan is .0142*180k or $2556
+> # Confirm with MC method by using this return and looking at the expected profit
+> profit <- replicate(10^4,{
++                         P <- sample( c(-120000,2556), 1000, replace=TRUE, prob=(c(1/50,49/50)) )
++                         mean(P)
++                     })
+> mean(profit)
+[1] 107.5517
+> # This is appropriately close to $100 per loan for the 1,000 loans.
 ```
 
 
