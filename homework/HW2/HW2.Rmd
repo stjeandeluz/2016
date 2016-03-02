@@ -675,3 +675,9 @@ Generate a simulation with correlated outcomes such as those above. This time us
 ## Problem 4
 
 Read [this wikipedia page](https://en.wikipedia.org/wiki/Financial_crisis_of_2007%E2%80%9308) about the financial crisis. Write a paragraph describing how what you learned in this homework can help explain the conditions that led to the crisis.
+
+There were a lot of complex reasons for the financial crisis, but the homework examples illustrate some basic points. The main variables we looked at were interest rate, default rate and number of loans. These factors used together could give an idea of expected bank profits and more generally, the likely values they could take. Banks could note the environment and offer the optimal number of loans at the optimal rate, anticipating a level of default.
+
+In the easy money conditions before the crisis, interest rates became very low and banks were limited in how high a rate they could charge given the competition. Low interest rates do less to cover potential losses, yet during this period, there was also an offsetting increase in the number of loans (loans and interest rates tend to negatively correlate). But the default rate also increased sharply as the housing market crashed. The complex combination of low rates/easy credit, a large loan balance sheet for the banks and a climbing rate of default all made the banks vulnerable to large losses.
+
+It is sort of like the roulette example, where a customer bets on the housing market. The casino(bank) offers a low price to bet so the customer plays, and they have optimized the odds to win in the long run under conditions that are stable. More and more customers come to play because it seems a cheap way to make money, but some of them are not able to pay out their losses and walk away from the table. So the casino's losses are substantial because they did not anticipate the different players who would visit and whether they were financially able. 
